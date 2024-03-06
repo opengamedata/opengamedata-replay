@@ -17,6 +17,8 @@ public class Replay : MonoBehaviour
 
     public List<Frame> frames = new List<Frame>();
 
+    public bool quitOnCompletion = true;
+
     [Serializable]
     public class Frame
     {
@@ -60,7 +62,7 @@ public class Replay : MonoBehaviour
     // Update is called once per frame
     void Update()
     {
-        if (playbackFrame < frames.Count + 1)
+        if (playbackFrame < frames.Count - 2)
         {
             Frame frame = frames[playbackFrame];
             Frame next = frames[playbackFrame + 1];
@@ -85,6 +87,13 @@ public class Replay : MonoBehaviour
 
 
                    
+        }
+        else if (quitOnCompletion)
+        {
+            Application.Quit();
+#if UNITY_EDITOR
+            UnityEditor.EditorApplication.isPlaying = false;
+#endif
         }
     }
 }
