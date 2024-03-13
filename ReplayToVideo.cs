@@ -21,11 +21,25 @@ public class ReplayToVideo : MonoBehaviour
 
     public int playbackFrame = 0;
 
+    public bool enableSkipping = true;
+    public float timeDiffToTriggerSkip = 3;
+
     public List<Frame> frames = new List<Frame>();
 
 
+    [Serializable]
+    public class VideoRecordingParameters
+    {
+        public int Width=1920;
+        public int Height=1080;
+        public float FPS=60f;
+        public bool RecordAudio = true;
+    }
+
+    public VideoRecordingParameters videoRecordingParameters = new VideoRecordingParameters();
+
     RecorderController m_RecorderController;
-    public bool m_RecordAudio = true;
+   
     internal MovieRecorderSettings m_Settings = null;
 
     public bool quitOnCompletion = true;
@@ -162,7 +176,7 @@ public class ReplayToVideo : MonoBehaviour
 
         // Video
         m_Settings = ScriptableObject.CreateInstance<MovieRecorderSettings>();
-        m_Settings.name = "My Video Recorder";
+        m_Settings.name = "Video Recorder";
         m_Settings.Enabled = true;
 
         // This example performs an MP4 recording
@@ -175,8 +189,8 @@ public class ReplayToVideo : MonoBehaviour
 
         m_Settings.ImageInputSettings = new GameViewInputSettings
         {
-            OutputWidth = 1920,
-            OutputHeight = 1080
+            OutputWidth = videoRecordingParameters.Width,
+            OutputHeight = videoRecordingParameters.Height
         };
 
         // Simple file name (no wildcards) so that FileInfo constructor works in OutputFile getter.
@@ -185,7 +199,7 @@ public class ReplayToVideo : MonoBehaviour
         // Setup Recording
         controllerSettings.AddRecorderSettings(m_Settings);
         controllerSettings.SetRecordModeToManual();
-        controllerSettings.FrameRate = 60.0f;
+        controllerSettings.FrameRate = videoRecordingParameters.FPS;
 
         RecorderOptions.VerboseMode = false;
         m_RecorderController.PrepareRecording();
@@ -255,6 +269,12 @@ public class ReplayToVideo : MonoBehaviour
         {
             Frame next = frames[playbackFrame + 1];
             float playbackTime = Time.time;
+
+            //do we need to skip ahead?
+            if ((enableSkipping) && (next.time - playbackTime > timeDiffToTriggerSkip))
+            {
+                playbackFrame++;
+            }
 
             if (playbackTime > next.time)
                 playbackFrame++;
