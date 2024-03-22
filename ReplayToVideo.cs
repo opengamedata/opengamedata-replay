@@ -248,7 +248,7 @@ public class ReplayToVideo : MonoBehaviour
 
         //are we looping over a folder?
       //  Debug.Log("Test Replay Counter: " + repalyFolderFileCounter + " / " + replayFolderFiles.Length);
-        if (repalyFolderFileCounter < replayFolderFiles.Length)
+        if ((repalyFolderFileCounter >=0) && (repalyFolderFileCounter < replayFolderFiles.Length))
         {
             //we are done. Exit this process
             EditorApplication.update += IterateOnFolders;
